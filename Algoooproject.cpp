@@ -89,11 +89,20 @@ string safeText(const string &prompt) {
     }
 }
 
-bool zoneCompare(const Zone &a, const Zone &b) {
+/*bool zoneCompare(const Zone &a, const Zone &b) {
     if (a.urgency != b.urgency) return a.urgency > b.urgency;
     if (a.population != b.population) return a.population > b.population;
     return a.distance < b.distance;
+}*/
+
+bool zoneCompare(const Zone &a, const Zone &b) {
+    if (a.urgency != b.urgency)
+        return a.urgency > b.urgency; // Higher urgency first
+    if (a.population != b.population)
+        return a.population > b.population; // Higher population first
+    return a.distance < b.distance; // Shorter distance first
 }
+
 
 void merge(vector<Zone> &a, int l, int m, int r) {
     vector<Zone> left(a.begin() + l, a.begin() + m + 1);
@@ -115,7 +124,8 @@ void mergeSort(vector<Zone> &a, int l, int r) {
         merge(a, l, m, r);
     }
 }
-void inputZones(vector<Zone> &zones, int count) {
+
+  void inputZones(vector<Zone> &zones, int count) {
     vector<string> districtList = {
         "Dhaka", "Chittagong", "Khulna", "Rajshahi", "Barisal",
         "Sylhet", "Rangpur", "Mymensingh", "Cumilla", "Noakhali",
@@ -137,13 +147,11 @@ void inputZones(vector<Zone> &zones, int count) {
             if (!used[d])
                 cout << "  " << d + 1 << ". " << districtList[d] << "\n";
         }
-
-        cout << "\n";
-        setColor(14);
-
+cout << "\n";
+  setColor(14);
         int dChoice;
         while (true) {
-            dChoice = safeInt("Enter district number (1-20): ", 1, 20); // FIXED
+            dChoice = safeInt("Enter district number (1-20): ", 1, 20);
             if (!used[dChoice - 1]) {
                 used[dChoice - 1] = true;
                 break;
@@ -159,7 +167,7 @@ void inputZones(vector<Zone> &zones, int count) {
         z.area = "Main Area";
         z.country = "Bangladesh";
 
-        z.population = safeInt("Population (1-50000): ", 1, 50000); // FIXED
+        z.population = safeInt("Population (1-50000): ", 1, 50000);
         z.urgency = safeInt("Urgency (1=Low, 2=Medium, 3=High): ", 1, 3);
         z.distance = safeDouble("Distance (km, max 5000): ", 0, 5000);
 
@@ -167,27 +175,36 @@ void inputZones(vector<Zone> &zones, int count) {
         z.medKits = safeInt("Medicine Kits: ", 0, INT_MAX);
         z.extraKits = safeInt(extraKitName + ": ", 0, INT_MAX);
 
-        const int perKmCost = 70;
-        const int foodKitCost = 300;
-        const int medKitCost = 500;
-        const int extraKitCost = 400;
 
-        long long distanceCost = z.distance * perKmCost;
-        long long foodCost = z.foodKits * foodKitCost;
-        long long medCost = z.medKits * medKitCost;
-        long long extraCost = z.extraKits * extraKitCost;
+         // Step 1: Define cost constants
+const int perKmCost = 70;
+const int foodKitCost = 300;
+const int medKitCost = 500;
+const int extraKitCost = 400;
 
-        z.totalCost = distanceCost + foodCost + medCost + extraCost;
+// Step 2: Calculate total cost as per your formula
+long long distanceCost = z.distance * perKmCost;
+long long foodCost = z.foodKits * foodKitCost;
+long long medCost = z.medKits * medKitCost;
+long long extraCost = z.extraKits * extraKitCost;
+
+// Step 3: Total cost = sum of all
+z.totalCost = distanceCost + foodCost + medCost + extraCost;
+
 
         zones.push_back(z);
     }
 
+
     // ----------- Step 2: Show & Save Receipts -----------
+
     clearScreen();
-    setColor(14);
-    cout << "==================== DISTRIBUTION RECEIPT ====================\n";
+        setColor(14);
+        cout << "==================== DISTRIBUTION RECEIPT ====================\n";
     for (const Zone &z : zones) {
-        cout << "-------------------- Zone " << z.id << " --------------------\n";
+
+        //cout << "Zone ID: " << z.id << "\n";
+         cout << "-------------------- Zone " << z.id << " --------------------\n";
         cout << "Disaster: " << disasterType << "\n";
         cout << "District: " << z.district << "\n";
         cout << "Country: " << z.country << "\n";
@@ -195,9 +212,13 @@ void inputZones(vector<Zone> &zones, int count) {
         cout << "Urgency: " << z.urgency << "\n";
         cout << "Distance: " << z.distance << " km\n";
         cout << "Kits: Food=" << z.foodKits << ", Medicine=" << z.medKits << ", " << extraKitName << "=" << z.extraKits << "\n";
+       // cout << "Cost/km/kit: " << z.costPerKmPerKit << "\n";
         cout << "Total Cost: " << z.totalCost << "\n";
         cout << "==============================================================\n\n";
+        //setColor(7);
+       // system("pause");
 
+        // Save to file
         ofstream receiptFile("distribution_receipts.txt", ios::app);
         receiptFile << "==================== DISTRIBUTION RECEIPT ====================\n";
         receiptFile << "Zone ID: " << z.id << "\n";
@@ -208,30 +229,76 @@ void inputZones(vector<Zone> &zones, int count) {
         receiptFile << "Urgency: " << z.urgency << "\n";
         receiptFile << "Distance: " << z.distance << " km\n";
         receiptFile << "Kits: Food=" << z.foodKits << ", Medicine=" << z.medKits << ", " << extraKitName << "=" << z.extraKits << "\n";
-        receiptFile << "perKmCost = 70\nperfoodKitCost = 300\npermedKitCost = 500\nperextraKitCost = 400\n";
+        receiptFile << "perKmCost = 70 \nperfoodKitCost = 300 \npermedKitCost = 500 \nperextraKitCost = 400"<< "\n";
         receiptFile << "Total Cost: " << z.totalCost << "\n";
         receiptFile << "==============================================================\n\n";
         receiptFile.close();
-    }
+    }setColor(10);
+cout << "\nAll receipts displayed above.\n";
+setColor(7);
+system("pause"); //
 
-    setColor(10);
-    cout << "\nAll receipts displayed above.\n";
-    setColor(7);
-    system("pause");
 }
 
 
 
 
-
-
-
-void chooseBestZone(const vector<Zone> &zones) {
+/*void chooseBestZone(const vector<Zone> &zones) {
     const Zone &z = zones[0];
     cout << "\n[Recommended] First Relief Should Go To:\n";
     cout << "Zone " << z.id << ": " << z.address << " (" << z.district << ", " << z.country << ")\n";
     cout << "Reason: Highest urgency, largest population, shortest distance.\n";
+}*/
+
+string getOrdinalSuffix(int n) {
+    if (n % 100 >= 11 && n % 100 <= 13) return "th";
+    switch (n % 10) {
+        case 1: return "st";
+        case 2: return "nd";
+        case 3: return "rd";
+        default: return "th";
+    }
 }
+
+ void chooseBestZone(const vector<Zone> &zones) {
+    cout << "\n[Relief Priority Order Based on Urgency, Population, and Distance]\n\n";
+
+    for (int i = 0; i < zones.size(); ++i) {
+        const Zone &z = zones[i];
+        cout << i + 1 << getOrdinalSuffix(i + 1) << " Priority: Zone " << z.id << " (" << z.address << ", " << z.district << ")\n";
+
+        string reason;
+        if (i == 0) {
+            reason = "Highest urgency";
+        } else {
+            const Zone &best = zones[0];
+
+            if (z.urgency < best.urgency) {
+                reason = "Lower urgency";
+            } else if (z.urgency == best.urgency && z.population < best.population) {
+                reason = "Same urgency, but lower population";
+            } else if (z.urgency == best.urgency && z.population == best.population && z.distance > best.distance) {
+                reason = "Same urgency, same population but longer distance";
+            } else {
+                reason = "Lower priority based on urgency/population/distance";
+            }
+        }
+
+        cout << "Reason: " << reason << "\n\n";
+    }
+}
+
+
+/*string getOrdinalSuffix(int n) {
+    if (n % 100 >= 11 && n % 100 <= 13) return "th";
+    switch (n % 10) {
+        case 1: return "st";
+        case 2: return "nd";
+        case 3: return "rd";
+        default: return "th";
+    }
+}
+*/
 
 void calculateTotalCost(const vector<Zone> &zones) {
     long long total = 0;
@@ -293,11 +360,11 @@ void knapsackOptimize(vector<Zone> &zones) {
     while (true) {
         clearScreen();
         setColor(10);
-        cout << "========================================\n";
-        cout << "       Assalamu Alaikum \n\n";
-        cout << "   Welcome To RELIEF DISTRIBUTION SYSTEM \n";
-        cout << "                             by [NST]\n";
-        cout << "========================================\n\n";
+        cout << "\t\t\t\t========================================\n";
+        cout << "\t\t\t\t           Assalamu Alaikum \n\n";
+        cout << "\t\t\t\t  Welcome To RELIEF DISTRIBUTION SYSTEM \n";
+        cout << "\t\t\t\t                             by [NST]\n";
+        cout << "\t\t\t\t========================================\n\n";
         setColor(7);
         slowPrint("Press any key to begin...", 30);
         _getch();
@@ -338,6 +405,8 @@ void knapsackOptimize(vector<Zone> &zones) {
         setColor(14);
 
         chooseBestZone(zones);
+        system("pause");
+
         clearScreen();
         setColor(12);
         calculateTotalCost(zones);
